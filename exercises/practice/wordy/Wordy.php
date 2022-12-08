@@ -22,9 +22,45 @@
  * To disable strict typing, comment out the directive below.
  */
 
-declare(strict_types=1);
+// declare(strict_types=1);
 
 function calculate(string $input): int
 {
-    throw new \BadFunctionCallException("Implement the calculate function");
+    preg_match_all('/([a-zA-Z ]+)([-\d]+)?/', $input, $matches);
+    $digits = $matches[2];  // matches[0] whole statement, matches[1] first bit of text, matches[2] number to evaluate
+    print_r($matches);
+    
+    if(empty($digits[0])) {
+        echo 'Invalid input';
+    }
+
+    $running_total = 0;
+    for ($i = 0; $i < count($digits); $i++) {
+        $val = $digits[$i];
+        if ($i === 0) {
+            $running_total = $val;
+            continue;
+        }
+        $operation = $matches[1][$i]; // looks at operational statement at index i in $digits
+        // matches index 0 => whole statement, @index 1 = middle text, @index 2 the numbers
+        // echo $matches[1][$i];
+        switch ($operation) {
+            case ' plus ':  // 'plus' !== ' plus '
+                $running_total += $val;
+            break;
+            case ' minus ':
+                $running_total -= $val;
+            break;
+            case ' multiplied by ':
+                $running_total = $running_total * $val;
+            break;
+            case ' divided by ':
+                $running_total = $running_total / $val;
+            break;
+        }
+    }
+    echo $running_total;
+    return $running_total;
 }
+
+calculate('What is 5 plus 7 multiplied by 18 divided by 9 minus 10');
